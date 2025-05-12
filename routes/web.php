@@ -21,7 +21,6 @@ Route::get('/', function () {
 
 // All of these routes require authentication
 Route::middleware(['auth','verified'])->group(function () {
-    // Keep the old dashboard shortcut, but point it at /sales
     Route::redirect('/dashboard', '/sales')->name('coffee.sales');
 
     Route::resource('sales', SaleController::class)
@@ -35,7 +34,6 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/shipping-partners', function () {
         return view('shipping_partners');
     })->name('shipping.partners');
-
 });
 
 
