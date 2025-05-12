@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SaleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,18 +14,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Redirect root to the login page
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::redirect('/dashboard', '/sales');
+// All of these routes require authentication
+Route::middleware(['auth','verified'])->group(function () {
+    // Keep the old dashboard shortcut, but point it at /sales
+    Route::redirect('/dashboard', '/sales')->name('coffee.sales');
 
-Route::get('/sales', function () {
-    return view('coffee_sales');
-})->middleware(['auth'])->name('coffee.sales');
+    Route::resource('sales', SaleController::class)
+         ->only(['index', 'store'])
+         ->names([
+             'index' => 'sales.index',
+             'store' => 'sales.store',
+         ]);
 
-Route::get('/shipping-partners', function () {
-    return view('shipping_partners');
-})->middleware(['auth'])->name('shipping.partners');
+    // Your existing shipping partners page
+    Route::get('/shipping-partners', function () {
+        return view('shipping_partners');
+    })->name('shipping.partners');
+
+});
+
 
 require __DIR__.'/auth.php';
